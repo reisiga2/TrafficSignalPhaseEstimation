@@ -1,0 +1,21 @@
+function prob = ProbXgiveS(X, S, hmm)
+    
+   nX=size(X,2);
+   nS=size(S,2);
+   prob=1;
+   if nX~=nS
+       ERROR('X and S should be of same dimension') 
+   else
+        for i=1: nX
+            s=S(i);
+            x=X(i);
+            b=hmm.OutputDistr(s).ProbMass(x);
+            prob=b*prob;
+             
+        end
+       
+   end
+
+
+
+end

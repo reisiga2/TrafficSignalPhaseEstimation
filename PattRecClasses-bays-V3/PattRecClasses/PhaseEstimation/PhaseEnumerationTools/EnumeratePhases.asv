@@ -1,0 +1,107 @@
+% To enumerate phases, on need to know type of the intersection. To define
+% the intersection type (fourway, threeway) we define a vector, called
+% IntersectionType. This vector contains 4 elements. The first element
+% identify the situation of Northern leg, second element the Eastern leg,
+% third the Southern and forth the Western leg. 
+% Each element can take a values, 0,1,2 and 3 with the following meanings:
+
+% 0 means there is no leg. For example at a 3 way intersection.
+% 1 : the leg has both inflow and outflow (twoway)
+% 2: the leg is oneway and the traffic moves toward intersection.
+% 3: the leg is oneway and the traffic moves out from the intersection. 
+
+% another input is determining if the right turns are allowed on red or
+% not. The defualt is to allow right turns on red. To specify no right turn
+% on red, set the value to zero. 
+
+% Based on the intersection type, all possible maneuvers will be determine.
+% Then it will generate all possible maneuver combinations that are not
+% confilicting
+
+%Note:
+%SBT=1, SBR=2, SBL=3,
+%WBT=4, WBR=5, WBL=6,
+%NBT=7, NBR=8, NBL=9,
+%EBT=10, EBR=11, EBL=12.
+
+
+
+
+function [phases, numPhases] = EnumeratePhases(intersectionType,...
+    rightTurnOnRedFlag)
+
+    rightTurnsIndex = [2,5,8,11]; 
+    
+    if nargin<2
+        rightTurnOnRedFlag =1;
+        
+    end
+    
+    if nargin<1
+        intersectionType=[1 1 1 1];
+        
+    end
+       
+    if  intersectionType  
+    possibleManeuvers = find_possible_maneuvers(intersectionType); % all possible maneuvers at the intersection
+    phases= updatePhases(possibleManeuvers);
+    numPhases_temp = size(phases,1);
+    
+    if rightTurnOnRedFlag==1 % allow right turns on red, add right turns to the phases.
+        tic;
+        for i=1:numPhases_temp
+             phases(i,rightTurnsIndex)=possibleManeuvers(1,rightTurnsIndex);
+        
+        end
+        toc;
+        
+    end
+    
+    
+    phases = unique(phases,'rows'); % remove similar phases.
+    numPhases = size(phases,1);
+    
+    else
+        
+        phases = xlsread('DefualPhases.xlsx');
+    end    
+            
+            
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    

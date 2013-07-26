@@ -1,0 +1,9 @@
+%test MarkovChainES0
+nStates=3;%external states
+stateDur=10;
+mc=initLeftRight(MarkovChainES,nStates,stateDur);
+disp('Mean State Duration');disp(mc.meanStateDuration);
+figure(1);
+plot(mc.
+mc=mc.splitStates([2 3 4]);
+disp('Mean State Duration');disp(mc.meanStateDuration);

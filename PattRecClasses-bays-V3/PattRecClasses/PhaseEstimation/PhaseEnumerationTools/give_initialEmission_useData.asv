@@ -1,0 +1,16 @@
+% this function initiate the output emission distribution using data. 
+
+function emissionProbD = give_initialEmission_useData(data,phases)
+
+percentage_of_Maneuvers = data_statistics(data);
+
+
+for i=1:size(phases,1)
+    emissionMatrix = phases(i,:).*percentage_of_Maneuvers;
+    
+    
+    
+    emissionProbD(i)= DiscreteD(emissionMatrix);
+    
+
+end

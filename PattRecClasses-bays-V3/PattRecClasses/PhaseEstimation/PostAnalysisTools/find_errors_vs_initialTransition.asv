@@ -1,0 +1,45 @@
+% this function give errors in inference with respect to changes in off
+% diagonal values of transition probabilities. 
+
+
+
+
+function [transitionProb_from_i_to_j,error]=...
+    find_errors_vs_initialTransition(data,phases,PriorParameters,eps)
+
+maxTransition = 1/size(phases,1);
+
+if(eps>maxTransition)
+    eps= maxTransition-0.0001;
+end
+maxTransition = 1/size(phases,1);
+illegalManProb=0;
+
+transitionProb_from_i_to_j = 0.0001:eps:maxTransition;
+    error =zeros(1,size(transitionProb_from_i_to_j,2));
+    
+    for i=1:size(transitionProb_from_i_to_j,2)
+        initialHmm = ...
+    initiateIntersectionHMM(data,phases,transitionProb_from_i_to_j(i),illegalManProb);
+
+    hmm=train(initialHmm,(data(:,1))',size((data(:,1)),1),...
+        PriorParameters.initials,PriorParameters.transitionMatrix,...
+        PriorParameters.emissionMatrix);
+        
+    
+    inferredPhaseSequence = viterbi(hmm,(data(:,1))' );
+
+    error(i)= find_error(data,inferredPhaseSequence);
+    
+ % to see how where the errors occur you can uncomment the following.    
+    figure 
+    plot(inferredPhaseSequence,'*')
+    hold on
+    plot(data(:,3),'o', 'MarkerEdgeColor','r');
+
+    end
+    
+    
+
+
+end

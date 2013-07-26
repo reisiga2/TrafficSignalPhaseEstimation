@@ -1,0 +1,19 @@
+% this function generate an initial HMM parameters. 
+
+% input: phases
+
+%output: an HMM to start the training. 
+
+function initialHmm = ...
+    initiateIntersectionHMM(data,phases,transitionProb_from_i_to_j,illegalManeuverProb,methodFlag)
+if nargin<4
+    
+end
+
+mc = initiate_MarkovChain(phases,transitionProb_from_i_to_j);% initial Markov Chain 
+
+[emissinMatrix, emissinDiscreteD] =...
+    give_initial_emissionProbs(phases,illegalManeuverProb); % initial Emission Distribution
+  
+initialHmm = HMM(mc ,emissinDiscreteD);
+end

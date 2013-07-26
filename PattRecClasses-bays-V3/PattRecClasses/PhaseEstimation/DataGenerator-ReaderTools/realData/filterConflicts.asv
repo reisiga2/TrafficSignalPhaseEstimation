@@ -1,0 +1,29 @@
+
+
+
+function data3 = filterConflicts(data2)
+
+    NtoSRing = [1,2,7,9]; % maneuvers from north to south. right turns does not included.  
+    EtoWRing = [5,6,10,12]; % maneuvers from west to east. right turns does not included
+    
+    rowsOfData2=size(data2,1);
+    colsOfData2=size(data2,2);
+    k=1;
+    
+    TimeTelorance = 5;
+    
+    for i= 1: (rowsOfData2)-2
+        
+          t = data2(i+2)-time(i);
+                    
+                           
+            if (ismember(data(i+1),NtoSRing) && ismember(data(i),EtoWRing)&&...
+                    ismember(data(i+2),EtoWRing) && t<TimeTelorance)
+                
+               
+                
+            elseif (ismember(data(i+1),EtoWRing) && ismember(data(i),NtoSRing)&&...
+                    ismember(data(i+2),NtoSRing) && t<TimeTelorance)
+    
+    
+    end

@@ -1,0 +1,30 @@
+% test. Use exat same values to check if it gives NAN again. 
+
+p1=DiscreteD([0 3 0 27 10 10 0 3 0 27 10 10]);
+p2=DiscreteD([27 10 10 0 3 0 27 10 10 0 3 0]);
+p3=DiscreteD([0 3 0 0 3 44 0 3 0 44 3 0]);
+p4=DiscreteD([0 3 44 0 3 0 0 3 44 0 3 0]);
+p5=DiscreteD([0 3 0 0 3 0 03 0 51  20 20]);
+p6= DiscreteD([0  0 51 20 20 0 3 0 0 3 0]);
+p7=DiscreteD([0 3 0 0 3 0 51 20 20 0 3 0]);
+p8 = DiscreteD([51 20 20 0 3 0 0 3 0 0 3 0]);
+
+P= [p1 p2 p3 p4 p5 p6 p7 p8];
+[phases, numPhases] = EnumeratePhases([1 1 1 1],0);
+mc = initiate_MarkovChain(phases,0.001);
+
+initialH=HMM(mc,P);
+
+ hmm=train(initialHmm,(data(:,1))',size((data(:,1)),1),...
+        PriorParameters.initials,PriorParameters.transitionMatrix,...
+        PriorParameters.emissionMatrix);
+        
+    
+    inferredPhaseSequence = viterbi(hmm,(data(:,1))' );
+
+    error(i)= find_error(data,inferredPhaseSequence);
+    
+    figure
+    plot(inferredPhaseSequence,'*')
+    hold on
+    plot(data(:,3),'o', 'MarkerEdgeColor','r');

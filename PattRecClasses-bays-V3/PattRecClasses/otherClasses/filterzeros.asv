@@ -1,0 +1,21 @@
+% this function is to remove any zero from the translated data. zeros in
+% the translated data corresponds to the maneuvers that are impossible to
+% happen or errors in data collection.  
+
+function data2 = filterzeros(data1)
+
+rowsOfData1=size(data1,1);
+k=1;
+
+for i = 1:rowsOfData1
+   
+    if data1(i,1)==0
+    
+    else
+        data2(k) = data1(i,:);
+        k=k+1;
+    end
+    
+end
+
+end

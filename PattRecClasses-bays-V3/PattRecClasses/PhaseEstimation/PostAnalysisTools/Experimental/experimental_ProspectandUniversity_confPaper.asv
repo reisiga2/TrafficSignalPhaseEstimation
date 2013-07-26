@@ -1,0 +1,23 @@
+% this script is to infere phases for the prospect and university
+% intersection. Since this intersection is not a four way intersection, and
+% the phases in the conference paper defined differently one should
+% enumerate phases manually.  
+
+clear all
+close all
+
+maneuverIDList_Kirby_and_University= [63121, 0,63127, 0, 0, 0,...
+    63106, 63128, 0, 63129, 63123, 63108];
+
+data =  ...
+    loadIntersectionData('April3_UniveandProsp1.xlsx',...
+    maneuverIDList_Kirby_and_University, 1,...
+    [],[],[],[],[],[],[],[]);
+
+
+phases =[ 0 0 0 0 0 0 0 0 0 1 1 1;...
+          0 0 0 0 0 0 0 0 0 1 1 0;...
+          0 0 0 0 0 0 0 0 0 0 0 1] ;
+
+priorParameters = give_DrichletParameter...
+    (partPhases, 1.01,100,1,1);

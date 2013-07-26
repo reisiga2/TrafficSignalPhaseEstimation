@@ -1,0 +1,42 @@
+% this fucntion is to generate a matrix of parameters for a drichlet
+% distribution. This is inparticular for transition probabilities. 
+%It is very naive and should not be considered as a general method. 
+
+%input: 
+%ManeuverWeight:
+%for each manuever we set a value. then for the phases with higher
+%number of maneuvers we put a higher value for its parameter on diagonal to
+%increase the duration of the that phase comparing to other phaess. 
+
+% transitionWeight: we consdier a value for parameters on off-diagonal to show
+% increase or decrease the transition chance from one state to another. It
+% is more interesting if we have sigle value for trans_value in the prior. 
+
+function  parameters =...
+    DirichletParam_transitionProbs_Matrix(numPhase,numOfManInEachPhase,maneuverWeight,transitionWeight)
+
+    if nargin<4
+        transitionWeight=1;
+    end
+    
+    if nargin<3
+        maneuverWeight=1;
+    end
+    
+    
+     parameters=zeros(numPhase, numPhase);
+    
+    for i=1:numPhase
+        for j=1:numPhase
+            
+            if(i==j)
+                 parameters(i,j)= numOfManInEachPhase(i)*maneuverWeight; % set the parameters
+            
+            else 
+                 parameters(i,j)= transitionWeight;
+            end
+            
+        
+        end
+    end
+    

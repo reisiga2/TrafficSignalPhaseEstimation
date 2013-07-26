@@ -1,0 +1,13 @@
+%pMass=double(pD)
+%converts a DiscreteD object or column vector of such objects
+%to an array with ProbMass values.
+%i.e. inverse of pD=DiscreteD(pMass).
+%
+%Result:
+%pMass(i,m)= P(Z(i)=m), with Z(i) the i-th DiscreteD random variable.
+%
+%Arne Leijon 2006-08-26 tested
+
+function pMass=double(pD)
+for i=1:numel(pD)
+    

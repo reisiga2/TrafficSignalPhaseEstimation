@@ -1,0 +1,39 @@
+% this function is to generate plots.
+
+function ...
+    generatePlotsOfPhaseSequence(intersectionName,data,inferredStateSequence, range)
+
+sizeOfData= size (realPhases, 2);
+
+if range> sizeOfData
+   
+    error ('range is too big, please consier smaller range for plotting.')
+    
+else
+    
+
+figure
+plot(data(1:range,2),data(1:range,1),'*', 'markersize', 5);
+title(intersectionName);
+set(gca,'YTick',1:1:12);
+set(gca,'YTickLabel',{'SBT', 'SBR', 'SBL', 'WBT', 'WBR', 'WBL', 'NBT', 'NBR', 'NBL', 'EBT', 'EBR', 'EBL'});
+
+   %x = 1:range;
+   indCORRECT = realPhases(1:range)== inferredStateSequence(1:range);
+   indINCORRECT = realPhases(1:range)~= inferredStateSequence(1:range);
+
+figure
+ 
+    plot(data(1:range,2) ,data(1:range,3), 'x', 'markersize',6, 'MarkerEdgeColor','b');
+    title(intersectionName);
+    hold on
+    plot(data(indCORRECT,3), inferredStateSequence(indCORRECT), 's', 'markersize',6, 'MarkerEdgeColor','g');
+    plot(data(indINCORRECT,3), inferredStateSequence(indINCORRECT), 'o', 'markersize',6, 'MarkerEdgeColor','r');
+    legend('real', 'Correctly estimated','error');
+    set(gca,'YTick',1:1:8);
+    set(gca,'YTickLabel',{'Phase1', 'Phase2', 'Phase3', 'Phase4', 'Phase5', 'Phase6', 'Phase7', 'phase8'});
+    xlabel('Time(sec)')
+    ylabel('Phase')
+   
+end
+    

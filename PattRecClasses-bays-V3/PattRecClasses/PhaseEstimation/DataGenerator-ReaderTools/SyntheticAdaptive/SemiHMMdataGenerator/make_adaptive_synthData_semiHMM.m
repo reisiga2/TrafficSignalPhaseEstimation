@@ -1,0 +1,66 @@
+% this function generates data from a semi HMM method. It only uses, a
+% markov chain model to generate a sequence of phases and then for each
+% phases it will generate a sequence of maneuvers.
+
+%inputs:
+% phaseSequenceLength: length of the phase sequence one need to generate.
+%  numManeuverBound: a vector with 2 rows and N columns. the first row
+%  gives the min number of maneuver that can be generated from each phase,
+%  the second row contains the max values.  N is the number of phases.
+% emissionProbabilitiesFileName = a filename that contains emission probabilities of all the phases
+
+function data = make_adaptive_synthData_semiHMM(phaseSequenceLength,...
+    numManeuverBound,markovChainFileName, emissionProbabilitiesFileName)
+    
+    if nargin<4
+        emissionProbabilitiesFileName= 'EmissionProbs.xlsx'; % default 
+    end
+    
+    if nargin<3
+        markovChainFileName ='MCprobs.xlsx'; %default
+    end
+    
+    if nargin<2
+        numManeuverBound= [10 10 2 2 3 3 3 3; 40 40 8 8 15 15 15 15];
+    end
+    
+    initialProbs= [ 0.25,  0.25, 0.0833 ,  0.0833, 0.0833,  0.0833,  0.0833, 0.0833]; % change these if you want to have different MC but it is not effective. 
+    
+    % generate the phase sequence from a Markov Chain model.
+    transitionProbs = xlsread( markovChainFileName); % this is the name of the file that I use:'MCprobs.xlsx'
+    numPhases = size(transitionProbs,1);
+    mc = MarkovChain(initialProbs,transitionProbs);
+    phaseSequence = rand(mc,phaseSequenceLength);
+    
+    
+    % obtain number of maneuvers for each phase
+    numManeuver=zeros(1, numPhases);
+        
+   % get emission probabilities
+    emissionProbs =  xlsread(emissionProbabilitiesFileName);
+  
+    manCounts=[];
+    phases=[];
+    
+    % generate movements at each phase. 
+    for i=1:phaseSequenceLength
+        
+        numManeuver(i)= ceil( numManeuverBound(1,phaseSequence(i))+...
+            (numManeuverBound(2,phaseSequence(i))-...
+            numManeuverBound(1,phaseSequence(i)))*rand());
+       
+        maneuverCount_temp = singlePhaseRandomData(emissionProbs(phaseSequence(i),:),numManeuver(i)); % maneuver for the ith element in the phase sequence.
+        phases_temp = repmat( phaseSequence(i),1, numManeuver(i) );
+        
+        manCounts =[manCounts,maneuverCount_temp]; % accumilate counts
+        phases = [phases, phases_temp]; % phases corresponding to each maneuver
+       
+    end
+    
+        time = 1:1:size(manCounts,2); % just number of maneuvers (kind of like ID).
+        
+        
+        data=[manCounts', time', phases'];
+    
+
+end
