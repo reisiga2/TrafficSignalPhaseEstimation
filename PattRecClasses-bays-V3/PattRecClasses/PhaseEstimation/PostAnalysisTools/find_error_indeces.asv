@@ -1,0 +1,12 @@
+% this function gives the location of the errors.
+
+function errorData = find_error_indeces(data,inferredPhases)
+
+    errorIndex = data(:,3)~=inferredPhases';
+    
+    wrongInferedphaes = 
+    errorData = data(errorIndex,:);
+    
+    
+    
+end

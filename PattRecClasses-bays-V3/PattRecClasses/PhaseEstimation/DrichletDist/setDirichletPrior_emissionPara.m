@@ -26,30 +26,22 @@
             
 
 
-function nu_outcome = setDirichletPrior_emissionPara(phases,legalManeuverWeight,illegalManeuverWeight)
+function nu_outcome = setDirichletPrior_emissionPara(phases,...,
+    legalStraightManeuverWeight,legalTurnManeuverWeight, illegalManeuverWeight)
 
 numPhases= size(phases,1);
 numManeuvers = 12;
 
-if nargin<3
-     illegalManeuverWeight=1;
-end
-
-if nargin<2
-    legalManeuverWeight=1;
-end
-   
-
 nu_outcome = zeros(numPhases,numManeuvers);
 
-for i= 1:numPhases
+for i = 1:numPhases
     for j= 1: numManeuvers
-        if phases(i,j)== 1
-            nu_outcome(i,j)= legalManeuverWeight;
-        else
-            nu_outcome(i,j)= illegalManeuverWeight;
-            
-        
+        if phases(i,j)== 1 && rem(j,3)==1
+            nu_outcome(i,j)= legalStraightManeuverWeight;
+        elseif phases(i,j)== 1 && (rem(j,3)==0 || rem(j,3)==2)
+            nu_outcome(i,j)= legalTurnManeuverWeight;           
+        elseif phases(i,j)== 0
+             nu_outcome(i,j)= illegalManeuverWeight;
         end
     end
 end

@@ -1,4 +1,4 @@
-% This function is to get a Drichlet prior parameters for and HMM.
+% This function is to get a Drichlet prior parameters for an HMM.
 
 % input:
 %phases: phases is a matrix in which number of rows is equal to the number
@@ -17,19 +17,29 @@
 % increase or decrease the transition chance from one state to another. It
 % is more interesting if we have sigle value for trans_value in the prior.
 
-% ManeuverWeight is a structure which has two fields: legal and illegal.
+%legalManeuverWeight,illegalManeuverWeight
 % this gives weight to legal and illegal maneuvers in one phase.
 
 function priorParameters = give_DrichletParameter...
-    (phases, transitionWeight,dwellingWeight,ManeuverWeight)
+    (phases, transitionWeight,dwellingWeight, legalStraightManeuverWeight,...
+    legalTurnManeuverWeight,illegalManeuverWeight)
 
-    
+if nargin<6
+    illegalManeuverWeight=1;
+end
+
+if nargin<5
+    legalTurnManeuverWeight=300;
+if nargin<4
+    legalManeuverWeight=1;
+end
+    priorParameters.initials=zeros(1,size(phases,1))+5; 
 
     priorParameters.transitionMatrix =...
     DirichletParam_transitionProbs_Matrix(phases,dwellingWeight,transitionWeight);
-    
-    priorParameters.emissionMatrix =...
-        setDirichletPrior_emissionPara(phases,ManeuverWeight.legal,ManeuverWeight.illegal).
+   
+    setDirichletPrior_emissionPara(phases,...,
+    legalStraightManeuverWeight,legalTurnManeuverWeight, illegalManeuverWeight)
     
 
 end

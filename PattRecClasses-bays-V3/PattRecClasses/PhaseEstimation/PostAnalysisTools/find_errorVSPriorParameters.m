@@ -10,12 +10,10 @@ function [dwellingWeight, transitionWeight, error] =...
     
     eps2=eps*10; % use different mesh size
     
-   dwellingWeight = 1.01:eps2: maxDwellingWeight;% mesh
-   transitionWeight = 1.01:eps:maxTransitionWeight;% mesh
+   dwellingWeight = 1:eps2: maxDwellingWeight;% mesh
+   transitionWeight = 1.001:eps:maxTransitionWeight;% mesh
    
-   transitionProb_from_i_to_j =0.05; % set a transition prob
-   illegalManProb = 0;  % set illegal maneuver probability 
-   
+      
    error = zeros(size(dwellingWeight,2),size(transitionWeight,2));
    
    
@@ -24,10 +22,11 @@ function [dwellingWeight, transitionWeight, error] =...
        for j=1: size(transitionWeight,2)
         
          PriorParameters = give_DrichletParameter...
-    (phases,transitionWeight(j) ,dwellingWeight(i),1,1); % set the priors base on the values of of dwelling and transition weights.
+    (phases,transitionWeight(j) ,dwellingWeight(i),1, 2000,8000); % set the priors base on the values of of dwelling and transition weights.
 
-            initialHmm = ...
-    initiateIntersectionHMM(data,phases,transitionProb_from_i_to_j,illegalManProb); % set initial HMM
+           initialHmm = make_initial_HMM_from_DirichletParameters...
+    (PriorParameters.initials, PriorParameters.transitionMatrix,...
+    PriorParameters.emissionMatrix); % set initial HMM
 
     hmm=train(initialHmm,(data(:,1))',size((data(:,1)),1),...
         PriorParameters.initials,PriorParameters.transitionMatrix,...

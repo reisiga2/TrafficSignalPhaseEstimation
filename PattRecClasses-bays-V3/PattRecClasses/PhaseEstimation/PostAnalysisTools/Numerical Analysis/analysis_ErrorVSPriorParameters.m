@@ -8,10 +8,10 @@ close all
 
 [phases, numPhases] = EnumeratePhases([1 1 1 1],1); % [1 1 1 1] full fourway intersection, 1: consider right turns.
 partPhases = phases(1:8,:); 
-
+phaseSequenceLength=20;
 iteration = 1; 
 
-%case A: No illegal maneuver
+% case A: No illegal maneuver
 emissionProbs = [0 1 0 39 5 5 0 1 0 39 5 5;...
                  39 5 5 0 1 0 39 5 5 0 1 0;...
                  0 1 0 0 1 48 0 1 0 0 1 48]; % data generated based on these ratios. we considered three phase intersection.
@@ -24,13 +24,18 @@ emissionProbs = [0 1 0 39 5 5 0 1 0 39 5 5;...
 
 for i = 1:iteration
 tic;
-    data = ...
-    loadIntersectionData('syntethicFixedTime',[], 0,...
-    [1 2 3],emissionProbs,[10 10],[10 10 5; 25 25 10],... %[10 10] gives min and max num of cycles.
-    [],[],[],[]);    % generate a synthetic data.
+% fixed time intersection.    
+% data = ...
+%     loadIntersectionData('syntethicFixedTime',[], 0,...
+%     [1 2 3],emissionProbs,[10 10],[10 10 5; 25 25 10],... %[10 10] gives min and max num of cycles.
+%     [],[],[],[]);    % generate a synthetic data.
+
+%sensor actuated intersection...
+data = make_adaptive_synthData_semiHMM(phaseSequenceLength);
+
 
     [dwellingWeight, transitionWeight, error] =...
-    find_errorVSPriorParameters(data, partPhases ,500, 10 , 1); % calculate errors in inference.
+    find_errorVSPriorParameters(data, partPhases ,500, 10 , 0.5); % calculate errors in inference.
     
     percError = error/size(data,1); % percentage in errors.
 
@@ -56,11 +61,23 @@ colormap cool
 title('Error(%)')
 
 
-
 figure
 surf(X,Y,AverageError)
 xlabel('alpha_d_w_e_l_l ');
 ylabel('alpha_t_r_a_n_s');
 zlabel('Error(%)');
 view([40,25])
-    
+
+figure
+% this generates a 2d  plot with colors .
+errorAverageFlipped =  fliprows(AverageError) ;
+imagesc(X,Y,errorAverageFlipped)
+colorbar;
+caxis([0, 10]);
+xlim([1,9]);
+ylim([1,500]);
+gca()
+xlabel('\mu_t ');
+ylabel('\mu_d');
+title('Error(%), C_s=8000, C_t=2000, C_p=1')
+set(gca,'YTickLabel',{'450','400','350','300','250','200','150','100','50','1'})

@@ -6,35 +6,73 @@
 
 
 
-maneuverIDList_Frist_SpringField = [36289	68481	68510	68482	68491	36290	68492	68511	68483	68509	36288	68490
-;
+maneuverIDList_Frist_SpringField = [36289,68481,68510,68482,68491,...
+    36290,68492,68511,68483,68509,36288,68490];
 
 data =  ...
     loadIntersectionData('SpringField-First_AdaptiveSignal.xlsx',...
     maneuverIDList_Frist_SpringField, 1,...
-    [],[],[],[],[],[],[],[]);% change 0 t0 1 if you want to pre-filter data
+    [],[],[],[],[],[],[],[]);% 
 
-data = data(1:500,:); % becasue I only manually labeled first 500 maneuvers.
+data = data(1:200,:); % becasue I only manually labeled first 200 maneuvers.
+%data=removeRightTurns(data); % remove right turns here.
 
+[maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
 [phases, numPhases] = EnumeratePhases([1 1 1 1],1); % [1 1 1 1] full fourway intersection
 partPhases = phases(1:8,:);
 
-PriorParameters = give_DrichletParameter...
-    (partPhases, 1.01,10,1,1);% change the function input to get different results.
+% PriorParameters = give_DrichletParameter...
+%     (partPhases, 1.001,1.2,1,1);% change the function input to get different results.
 
-transitionProb_from_i_to_j=0.01;
-illegalManProb=0;
 
-initialHmm = ...
-    initiateIntersectionHMM(data,partPhases,transitionProb_from_i_to_j,illegalManProb);
+% 
+% transitionProb_from_i_to_j=0.1;
+% illegalManProb=0;
+ 
+% Becasue of the particular structure of the adaptive signals, and the
+% knowledge that some transitions are not possibles, I used different
+% initial HMM to prevent some unlikely transitions.
+
+initialProbs=[0.1250 0.1250 0.1250 0.1250 0.1250 0.1250 0.1250 0.1250];
+mcProbs=xlsread('AdaptiveInitialTransProbs.xlsx'); % initial markov chain transition probs
+emissionPrbs=xlsread('AdaptiveInitialEmissionProbs.xlsx');% emission probs for initial hmm
+
+mc = MarkovChain(initialProbs,mcProbs);
+emissions = DiscreteD(emissionPrbs);
+% initialHmm = ...
+%     initiateIntersectionHMM(data,partPhases,transitionProb_from_i_to_j,illegalManProb);
+
+    initialHmm= HMM(mc, emissions);
 
     hmm=train(initialHmm,(data(:,1))',size((data(:,1)),1),...
         PriorParameters.initials,PriorParameters.transitionMatrix,...
         PriorParameters.emissionMatrix);
-        
+     
+    % but this HMM does not completely impose all the constraints in most
+    % of the adaptive signals. here we make some of the transition
+    % probabilities zero becasue they never appear in real adaptive
+    % signals.
     
-    inferredPhaseSequence = viterbi(hmm,(data(:,1))' );
+   iteration=10; 
+    
+   for i=1:iteration 
+   hmm = modify_hmm_for_adaptiveSignals(hmm);
+    
+   % we learn hmm again and will modify it again 
+     hmm=train(hmm,(data(:,1))',size((data(:,1)),1),...
+        PriorParameters.initials,PriorParameters.transitionMatrix,...
+        PriorParameters.emissionMatrix);
+   
+    hmm = modify_hmm_for_adaptiveSignals(hmm);
+   end
+    
+   % now we use new hmm to infer phases.   
+    
+    inferredPhaseSequence = viterbi(hmm ,(data(:,1))' );
 
-    error= find_error(data,inferredPhaseSequence);
-
-generatePlotsOfPhaseSequence('Prospect and University',data,inferredPhaseSequence, 500)
+    [error,errorPercentage]= find_error(data,inferredPhaseSequence);
+    
+ errorData = find_error_indeces(data,inferredPhaseSequence);
+ 
+generatePlotsOfPhaseSequence('First and Springfield',data,...
+    maneuverPercentage,inferredPhaseSequence, size(data,1))

@@ -21,22 +21,27 @@
 % this gives weight to legal and illegal maneuvers in one phase.
 
 function priorParameters = give_DrichletParameter...
-    (phases, transitionWeight,dwellingWeight,legalManeuverWeight,illegalManeuverWeight)
+    (phases, transitionWeight,dwellingWeight,illegalManeuverWeight,...
+        legalTurnManeuverWeight,legalStraightManeuverWeight)
+
+if nargin<6
+    legalStraightManeuverWeight = 80000;
+end
 
 if nargin<5
-    illegalManeuverWeight=1;
+    legalTurnManeuverWeight=40000;
 end
 
-if nargin<4
-    legalManeuverWeight=1;
-end
+
+
     priorParameters.initials=zeros(1,size(phases,1))+5; 
 
     priorParameters.transitionMatrix =...
     DirichletParam_transitionProbs_Matrix(phases,dwellingWeight,transitionWeight);
-    
-    priorParameters.emissionMatrix =...
-        setDirichletPrior_emissionPara(phases,legalManeuverWeight,illegalManeuverWeight);
+   
+    priorParameters.emissionMatrix =... 
+    setDirichletPrior_emissionPara(phases,...,
+    legalStraightManeuverWeight,legalTurnManeuverWeight, illegalManeuverWeight);
     
 
 end

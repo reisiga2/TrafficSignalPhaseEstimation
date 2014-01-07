@@ -76,6 +76,8 @@ errorAverage = errorSum/iteration;
 Y=illegalManProb;
 X=transitionProb_from_i_to_j;
 
+
+% this generates a contour plot.
 figure
 v=[0.2 0.5 0.8 1 1.2 1.5 2 3.5 5 10 15 20 40 60];     
 [C,h]= contour(X,Y,errorAverage,v);
@@ -85,6 +87,7 @@ ylabel('b(%) Emission Probability');
 colormap cool
 title('Error(%)')
 
+% this generates a 3d plot
 figure
 surf(X,Y,errorAverage)
 xlabel('a ');
@@ -93,3 +96,20 @@ zlabel('Error(%)');
 view([40,25])
  title('Bayesian Method, alpha_d_w_e_l_l=300, alpha_t_r_a_n_s=1.01');
 %title('Baum-Welch algorithm')
+
+
+
+
+% this generates a 2d  plot with colors .
+errorAverageFlipped =  fliprows(errorAverage) ;
+figure
+imagesc(X,Y,errorAverageFlipped)
+colorbar;
+caxis([0, 50]);
+gca()
+xlabel('a ');
+ylabel('b(%)');
+set(gca,'YTick',0:0.5:2);
+set(gca,'YTickLabel',{'2','1.5','1','0.5','0'})
+title('Error(%)');
+

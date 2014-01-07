@@ -1,0 +1,17 @@
+% this function generates initial hmm from parameters of
+% dirichlet distribution. 
+
+function initialHMM = make_initial_HMM_from_DirichletParameters...
+    (initialParameters, TransPrameters, EmissionParameters)
+    
+numState = size(TransPrameters,1);
+
+for i=1:numState
+   initTransProb(i,:) = TransPrameters(i,:)/sum(TransPrameters(i,:));  
+    
+end
+    
+
+
+
+end

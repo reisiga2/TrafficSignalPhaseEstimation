@@ -25,13 +25,16 @@ maxNumCycle,GeneratingPhases,emissionProbsGenData,numManeuver,iteration,...
     GeneratingPhases,emissionProbsGenData,[numCycle(j),numCycle(j)],numManeuver,... 
     [],[],[],[]);    % generate data for that number of cycle
 
-    realPhases = (data(:,3))';
+    
 
     dataSize = size(data,2);
-        
-    initialHmm = ...
-    initiateIntersectionHMM(data,allPhases,transitionProb_from_i_to_j,illegal_Man_Prob); % set initial HMM
-       
+         
+     initialHmm = ...
+     initiateIntersectionHMM(data,allPhases,transitionProb_from_i_to_j,illegal_Man_Prob); % set initial HMM
+%        initialHmm = make_initial_HMM_from_DirichletParameters...
+%     (DiricParam.initials, DiricParam.transitionMatrix,...
+%     DiricParam.emissionMatrix);
+
     hmm=train(initialHmm,(data(:,1))',size((data(:,1)),1),...
          DiricParam.initials, DiricParam.transitionMatrix,...
          DiricParam.emissionMatrix); % train the hmm
@@ -40,15 +43,14 @@ maxNumCycle,GeneratingPhases,emissionProbsGenData,numManeuver,iteration,...
      inferredPhaseSequence = viterbi(hmm,(data(:,1))' ); % phase sequence that is inferred by the trained HMM.
         
         totalDataSize= totalDataSize+ dataSize;
-        misslabled(i) = find_error(data,inferredPhaseSequence );
-        percError(i)= misslabled(i)/dataSize;
+        [misslabled(i),percError(i)] = find_error(data,inferredPhaseSequence );
         totalMissLabled = totalMissLabled + misslabled(i); % bookkeeping. 
         
         
           
     end
         averageError(j) = totalMissLabled/iteration;
-        averagePercError(j)= sum(percError)*100/iteration;
+        averagePercError(j)= sum(percError)/iteration;
         
         % this is another way of calculating percentage of the error. 
         

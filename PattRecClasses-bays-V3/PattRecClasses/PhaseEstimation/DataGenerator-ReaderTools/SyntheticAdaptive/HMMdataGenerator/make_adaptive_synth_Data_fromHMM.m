@@ -14,6 +14,7 @@ function data=...
     initialProbs = [ 0.25,  0.25, 0.0833 ,  0.0833, 0.0833,  0.0833,  0.0833, 0.0833]; 
     transitionProbs = xlsread('DefaultMarkovChain.xlsx'); 
     mc = MarkovChain(initialProbs,transitionProbs);
+    %emissionProbs= adaptiveRandomEmissions();
     emissionProbs = xlsread('DefaultEmissionProbs.xlsx'); 
     
     for i=1:size(emissionProbs,1)

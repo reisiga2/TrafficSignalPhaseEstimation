@@ -21,7 +21,7 @@ function data = make_adaptive_synthData_semiHMM(phaseSequenceLength,...
     end
     
     if nargin<2
-        numManeuverBound= [10 10 2 2 3 3 3 3; 40 40 8 8 15 15 15 15];
+        numManeuverBound= [20 20 2 2 3 3 3 3; 50 50 5 5 8 8 8 8];
     end
     
     initialProbs= [ 0.25,  0.25, 0.0833 ,  0.0833, 0.0833,  0.0833,  0.0833, 0.0833]; % change these if you want to have different MC but it is not effective. 

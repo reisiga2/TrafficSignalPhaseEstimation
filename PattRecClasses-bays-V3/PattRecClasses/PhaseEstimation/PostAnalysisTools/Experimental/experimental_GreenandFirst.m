@@ -16,6 +16,8 @@ maneuverIDList_Frist_Green = [68528,68531,68522,68524,68515,68530,....
 
 data = data(1:500,:); % becasue I only manually labeled first 500 maneuvers.
 
+data=removeRightTurns(data); % remove right turns here.
+
 [maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
 
 [phases, numPhases] = EnumeratePhases([1 1 1 1],1); % [1 1 1 1] full fourway intersection

@@ -1,0 +1,103 @@
+% this script check the phases of Neil and kirby using two sets of priors,
+% one with fixed time priors and one with adaptive priors. we are
+% interested to see if one of the fits better to the data.
+
+ clear all
+ close all
+% 
+% data = xlsread('NeilandKirby.xlsx');
+% 
+% [maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
+% 
+% data=removeRightTurns(data); % remove right turns here.
+% data=data(1:200,:);
+%------------------------------------------
+% maneuverIDList_Frist_SpringField = [36289,68481,68510,68482,68491,...
+%     36290,68492,68511,68483,68509,36288,68490];
+% 
+% data =  ...
+%     loadIntersectionData('SpringField-First_AdaptiveSignal.xlsx',...
+%     maneuverIDList_Frist_SpringField, 1,...
+%     [],[],[],[],[],[],[],[]); 
+% 
+% data = data(1:200,:); % becasue I only manually labeled first 200 maneuvers.
+% data=removeRightTurns(data); % remove right turns here.
+% [maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
+
+%---------------------------------------------------------------------
+% maneuverIDList_fourth_kirby = [69050,69044,69079,...
+%     69046,68914,69052,68913,69081,69045,69080,69051,68912];
+% 
+% [data,numdataFiltered] =  ...
+%     loadIntersectionData('kirbyFourth.xlsx',...
+%     maneuverIDList_fourth_kirby, 0,...
+%     [],[],[],[],[],[],[],[]);
+% data=data(1:200,:);
+% [maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
+%-------------------------------------------------------------
+% maneuverIDList_Frist_Green = [68528,68531,68522,68524,68515,68530,....
+%     68514,68533,68523,68532,68529,68513];
+% 
+% [data,numdataFiltered] =  ...
+%     loadIntersectionData('GreenandFirst-gameData.xlsx',...
+%     maneuverIDList_Frist_Green, 0,...
+%     [],[],[],[],[],[],[],[]);% change 0 t0 1 if you want to pre-filter data
+
+% data = data(1:500,:);
+% [maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
+% -----------------------------------------------------------------
+maneuverIDList_Frist_Green = [32790	39540	23958	39538	39794	32788	39795	23956	39539	23957	32789	39796
+
+
+[data,numdataFiltered] =  ...
+    loadIntersectionData('GreenandFirst-gameData.xlsx',...
+    maneuverIDList_Frist_Green, 0,...
+    [],[],[],[],[],[],[],[]);% change 0 t0 1 if you want to pre-filter data
+
+data = data(1:500,:);
+[maneuverPercentage, totalTime, phaseList ] = data_statistics(data);
+
+
+
+%----------------------------------------------------------------------
+% adaptive hmm to find
+[hmm_adaptive,probability_adaptive]= adaptive_hmm_maker(data);
+
+
+inferredPhaseSequence_adaptive = viterbi(hmm_adaptive ,(data(:,1))' );
+
+ [error_adaptive,errorPercentage_adaptive]= find_error(data,inferredPhaseSequence_adaptive);
+    
+ errorData_adaptive = find_error_indeces(data,inferredPhaseSequence_adaptive);
+ figure
+ plot(-probability_adaptive);
+ title('Sensor actuated')
+ xlabel('Iteration');
+ xlim([0,9]);
+ ylabel('-ln(pr(O|lamda))')
+ 
+%  generatePlotsOfPhaseSequence('Neil and Kirby',data,...
+%     maneuverPercentage,inferredPhaseSequence_adaptive, size(data,1));
+
+%-------------------------------------------------------------
+%fixed time hmm 
+ phases  = EnumeratePhases([1 1 1 1],1); % [1 1 1 1] full fourway intersection
+    partPhases = phases(1:8,:);
+
+
+[hmm_fix,probability_fix]= fixedTime_hmm_maker(data);
+inferredPhaseSequence_fix = viterbi(hmm_fix ,(data(:,1))' );
+
+ [error_fix,errorPercentage_fix]= find_error(data,inferredPhaseSequence_fix);
+    
+ errorData_fix = find_error_indeces(data,inferredPhaseSequence_fix);
+ figure
+ plot(-probability_fix, 'linewidth', 2);
+ title('fixed time')
+  xlabel('Iteration');
+ xlim([1,10]);
+ ylabel('-ln(pr(O|lamda))')
+ 
+%  %generatePlotsOfPhaseSequence('Neil and Kirby',data,...
+%     maneuverPercentage,inferredPhaseSequence_fix, size(data,1));
+%  
